@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.30",
+    "@types/node": "^12.6.8",
+    "@types/sharp": "^0.22.2",
+    "aws-sdk": "^2.495.0",
+    "sharp": "^0.22.1",
+    "tslib": "^1.10.0"
+  }
+}
