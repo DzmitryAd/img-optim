@@ -43,3 +43,7 @@ export const streamToSharp = ({ width, height, format }: TOptimProps) => {
     .resize(width, height)
     .toFormat(format)
 }
+type TKeyProps = TOptimProps & { key: string }
+export const createNewKey = ({ width, height, format, key }: TKeyProps) => {
+  return format + "/width=" + width + "/height=" + height + "/" + key
+}

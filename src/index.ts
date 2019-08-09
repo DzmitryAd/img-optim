@@ -1,7 +1,7 @@
 import { APIGatewayProxyHandler } from "aws-lambda"
-import { readStreamFromS3, streamToSharp, writeStreamToS3 } from "./fn"
-
-// const URL = `http://${BUCKET}.s3-website.${REGION}.amazonaws.com`
+import { createNewKey, readStreamFromS3, streamToSharp, writeStreamToS3 } from "./fn"
+const { BUCKET, REGION } = process.env
+const URL = `http://${BUCKET}.s3-website.${REGION}.amazonaws.com`
 
 type TQueryStringParameters = {
   bucket: string
@@ -23,11 +23,10 @@ const handler: APIGatewayProxyHandler = async event => {
   const key = params.key
   const width = Number(params.width)
   const height = Number(params.height)
-
-  const newKey = "" + width + "x" + height + "/" + key
-  const imageLocation = `${URL}/${newKey}`
-
   const format = "webp"
+
+  const newKey = createNewKey({ width, height, format, key })
+  const imageLocation = `${URL}/${newKey}`
 
   try {
     const readStream = readStreamFromS3({ Bucket: bucket_origin, Key: key })
