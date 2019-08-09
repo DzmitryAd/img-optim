@@ -1,7 +1,7 @@
-import { S3 } from "aws-sdk"
+const S3 = require("aws-sdk")
 import { BucketName, ObjectKey } from "aws-sdk/clients/s3"
-import sharp from "sharp"
-import stream from "stream"
+const sharp = require("sharp")
+const stream = require("stream")
 
 const s3 = new S3({
   signatureVersion: "v4",

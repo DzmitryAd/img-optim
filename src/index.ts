@@ -1,5 +1,5 @@
 import { APIGatewayProxyHandler } from "aws-lambda"
-import { createNewKey, readStreamFromS3, streamToSharp, writeStreamToS3 } from "./fn"
+const { createNewKey, readStreamFromS3, streamToSharp, writeStreamToS3 } = require("./fn")
 const { BUCKET, REGION } = process.env
 const URL = `http://${BUCKET}.s3-website.${REGION}.amazonaws.com`
 
@@ -11,6 +11,7 @@ type TQueryStringParameters = {
 }
 
 const handler: APIGatewayProxyHandler = async event => {
+  console.log("start handle")
   if (!event.queryStringParameters) {
     return {
       statusCode: 404,
@@ -18,6 +19,7 @@ const handler: APIGatewayProxyHandler = async event => {
     }
   }
   const params: TQueryStringParameters = event.queryStringParameters as TQueryStringParameters
+  console.log("params", params)
   const bucket_origin = params.bucket
   const bucket_destination = params.bucket
   const key = params.key
