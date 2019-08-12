@@ -1,17 +1,15 @@
 import { APIGatewayProxyHandler } from "aws-lambda"
 const { createNewKey, readStreamFromS3, streamToSharp, writeStreamToS3 } = require("./fn")
 const { BUCKET, REGION } = process.env
-const URL = `http://${BUCKET}.s3-website.${REGION}.amazonaws.com`
+const URL = `http://${BUCKET}.s3.${REGION}.amazonaws.com`
 
 type TQueryStringParameters = {
-  bucket: string
   key: string
   width: string
   height: string
 }
 
 const handler: APIGatewayProxyHandler = async event => {
-  console.log("start handle")
   if (!event.queryStringParameters) {
     return {
       statusCode: 404,
@@ -19,9 +17,8 @@ const handler: APIGatewayProxyHandler = async event => {
     }
   }
   const params: TQueryStringParameters = event.queryStringParameters as TQueryStringParameters
-  console.log("params", params)
-  const bucket_origin = params.bucket
-  const bucket_destination = params.bucket
+  const bucket_origin = BUCKET
+  const bucket_destination = BUCKET
   const key = params.key
   const width = Number(params.width)
   const height = Number(params.height)
@@ -37,7 +34,6 @@ const handler: APIGatewayProxyHandler = async event => {
       { Bucket: bucket_destination, Key: newKey },
       { ContentType: "image/" + format }
     )
-
     readStream.pipe(resizeStream).pipe(writeStream)
     const uploadedData = await uploadFinished
 
@@ -62,4 +58,4 @@ const handler: APIGatewayProxyHandler = async event => {
   }
 }
 
-export { handler }
+exports.handler = handler
