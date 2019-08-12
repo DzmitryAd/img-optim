@@ -49,7 +49,8 @@ const handle = async (event: FetchEvent) => {
   reqHeaders.set("Cache-Control", "max-age=31536000")
   let origin_response = await fetch(target_url)
   if (!origin_response.ok) {
-    const gateWayUrl = env.API_GATEWAY_URL + "/" + convertPathnameToSearchParams(url.pathname)
+    const gateWayUrl =
+      env.API_GATEWAY_URL + "?" + convertPathnameToSearchParams(url.pathname.replace("/", ""))
     origin_response = await fetch(gateWayUrl)
   }
   const headers = new Headers(origin_response.headers)
