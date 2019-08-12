@@ -4,13 +4,14 @@ const { BUCKET, REGION } = process.env
 const URL = `http://${BUCKET}.s3.${REGION}.amazonaws.com`
 
 type TQueryStringParameters = {
+  format?: string
+  width?: string
+  height?: string
   key: string
-  width: string
-  height: string
 }
 
 const handler: APIGatewayProxyHandler = async event => {
-  if (!event.queryStringParameters) {
+  if (!(event.queryStringParameters && event.queryStringParameters.key)) {
     return {
       statusCode: 404,
       body: "queryStringParameters do not exist",
@@ -20,9 +21,9 @@ const handler: APIGatewayProxyHandler = async event => {
   const bucket_origin = BUCKET
   const bucket_destination = BUCKET
   const key = params.key
-  const width = Number(params.width)
-  const height = Number(params.height)
-  const format = "webp"
+  const width = params.width ? Number(params.width) : null
+  const height = params.height ? Number(params.height) : null
+  const format = params.format || "webp"
 
   const newKey = createNewKey({ width, height, format, key })
   const imageLocation = `${URL}/${newKey}`
