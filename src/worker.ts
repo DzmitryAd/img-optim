@@ -74,7 +74,7 @@ const convertPathnameToSearchParams = (image_pathname: string): string => {
     : params_arr[1].startsWith("h_")
     ? params_arr[1].replace("h_", "")
     : ""
-  const keyStart = height && width ? 3 : height && width ? 2 : 1
+  const keyStart = height && width ? 3 : height || width ? 2 : 1
   const key = params_arr.slice(keyStart).join("-")
   return `format=${format}${width ? "&width=" + width : ""}${
     height ? "&height=" + height : ""
