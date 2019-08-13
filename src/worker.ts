@@ -49,8 +49,7 @@ const handle = async (event: FetchEvent) => {
   reqHeaders.set("Cache-Control", "max-age=31536000")
   let origin_response = await fetch(target_url)
   if (!origin_response.ok) {
-    const gateWayUrl =
-      env.API_GATEWAY_URL + "?" + convertPathnameToSearchParams(url.pathname.replace("/", ""))
+    const gateWayUrl = env.API_GATEWAY_URL + "?" + convertPathnameToSearchParams(url.pathname)
     origin_response = await fetch(gateWayUrl)
   }
   const headers = new Headers(origin_response.headers)
@@ -63,22 +62,21 @@ const handle = async (event: FetchEvent) => {
   return responce_clone
 }
 
-const convertPathnameToSearchParams = (image_pathname: string): string => {
-  const params_arr = image_pathname.split("-")
-  const format = params_arr[0]
-  const width = params_arr[1].startsWith("w_") ? params_arr[1].replace("w_", "") : ""
-  const height = width
-    ? params_arr[2].startsWith("h_")
-      ? params_arr[2].replace("h_", "")
-      : ""
-    : params_arr[1].startsWith("h_")
-    ? params_arr[1].replace("h_", "")
-    : ""
-  const keyStart = height && width ? 3 : height || width ? 2 : 1
-  const key = params_arr.slice(keyStart).join("-")
-  return `format=${format}${width ? "&width=" + width : ""}${
-    height ? "&height=" + height : ""
-  }&key=${key}`
+const trimParam = (predicate: string, param: string | undefined): string | null => {
+  return param ? param.replace(predicate, "") : null
+}
+const predicates = ["f_", "w_", "h_"]
+
+const convertPathnameToSearchParams = (image_pathname: string): string | false => {
+  const path_arr = image_pathname.split("/")
+  const params_arr = path_arr[1].split("-")
+  const key = path_arr.length === 3 ? path_arr[2] : path_arr.slice(2).join("/")
+  const [format, width, height] = predicates.map(predicate => {
+    return trimParam(predicate, params_arr.find(p => p.startsWith(predicate)))
+  })
+  return `${format ? "format=" + format + "&" : ""}${width ? "width=" + width + "&" : ""}${
+    height ? "height=" + height + "&" : ""
+  }key=${key}`
 }
 
 const try_catch_handler = async (event: FetchEvent) => {

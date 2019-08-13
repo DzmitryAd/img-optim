@@ -23,8 +23,10 @@ const handler: APIGatewayProxyHandler = async event => {
   const key = params.key
   const width = params.width ? Number(params.width) : null
   const height = params.height ? Number(params.height) : null
-  const format = params.format || "webp"
-
+  const format = params.format || null
+  const keyArr = key.split(".")
+  const ext = keyArr.length > 1 ? keyArr[keyArr.length - 1] : null
+  const cFormat = format || ext || "webp"
   const newKey = createNewKey({ width, height, format, key })
   const imageLocation = `${URL}/${newKey}`
 
@@ -33,7 +35,7 @@ const handler: APIGatewayProxyHandler = async event => {
     const resizeStream = streamToSharp({ width, height, format })
     const { writeStream, uploadFinished } = writeStreamToS3(
       { Bucket: bucket_destination, Key: newKey },
-      { ContentType: "image/" + format }
+      { ContentType: "image/" + cFormat }
     )
     readStream.pipe(resizeStream).pipe(writeStream)
     const uploadedData = await uploadFinished

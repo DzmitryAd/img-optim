@@ -38,14 +38,33 @@ exports.writeStreamToS3 = ({ Bucket, Key }: TStreamS3Props, options: TStreamWrit
 type TOptimProps = {
   width: number | null
   height: number | null
-  format: "jpeg" | "png" | "webp"
+  format: "jpeg" | "png" | "webp" | null
 }
 exports.streamToSharp = ({ width, height, format }: TOptimProps) => {
-  return sharp()
-    .resize(width, height)
-    .toFormat(format)
+  return format
+    ? sharp()
+        .resize(width, height)
+        .toFormat(format)
+    : sharp().resize(width, height)
 }
-type TKeyProps = TOptimProps & { key: string }
-exports.createNewKey = ({ width, height, format, key }: TKeyProps) => {
-  return `${format}${width ? "-w_" + width : ""}${height ? "-h_" + height : ""}-${key}`
+type TNewKeyProps = TOptimProps & { key: string }
+exports.createNewKey = ({ width, height, format, key }: TNewKeyProps) => {
+  let result = ""
+  if (format) {
+    result += `f_${format}`
+  }
+  if (width) {
+    if (result) {
+      result += "-"
+    }
+    result += `w_${width}`
+  }
+  if (height) {
+    if (result) {
+      result += "-"
+    }
+    result += `h_${height}`
+  }
+
+  return result ? `${result}/${key}` : key
 }
