@@ -1,5 +1,6 @@
 import { APIGatewayProxyHandler } from "aws-lambda"
 const { createNewKey, readStreamFromS3, streamToSharp, writeStreamToS3 } = require("./fn")
+const fetch = require("node-fetch")
 const { BUCKET, REGION } = process.env
 const URL = `http://${BUCKET}.s3.${REGION}.amazonaws.com`
 
@@ -8,6 +9,7 @@ type TQueryStringParameters = {
   width?: string
   height?: string
   key: string
+  image_src?: string
 }
 
 const handler: APIGatewayProxyHandler = async event => {
@@ -21,17 +23,26 @@ const handler: APIGatewayProxyHandler = async event => {
   const bucket_origin = BUCKET
   const bucket_destination = BUCKET
   const key = params.key
+  const image_src = params.image_src || null
   const width = params.width ? Number(params.width) : null
   const height = params.height ? Number(params.height) : null
   const format = params.format || null
-  const keyArr = key.split(".")
-  const ext = keyArr.length > 1 ? keyArr[keyArr.length - 1] : null
-  const cFormat = format || ext || "webp"
-  const newKey = createNewKey({ width, height, format, key })
+  const newKey = createNewKey({
+    width,
+    height,
+    format,
+    key,
+  })
   const imageLocation = `${URL}/${newKey}`
 
+  const keyArr = key ? key.split(".") : []
+  const ext = keyArr.length > 1 ? keyArr[keyArr.length - 1] : null
+  const cFormat = format || ext || "webp"
+
   try {
-    const readStream = readStreamFromS3({ Bucket: bucket_origin, Key: key })
+    const readStream = image_src
+      ? (await fetch(image_src)).body
+      : readStreamFromS3({ Bucket: bucket_origin, Key: key })
     const resizeStream = streamToSharp({ width, height, format })
     const { writeStream, uploadFinished } = writeStreamToS3(
       { Bucket: bucket_destination, Key: newKey },

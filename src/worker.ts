@@ -37,7 +37,7 @@ type TWorkerCtxEnv = {
 const handle = async (event: FetchEvent) => {
   const env: TWorkerCtxEnv = await kvEnvStore.getEnv()
   const url = new URL(event.request.url)
-
+  const image_src = url.searchParams.get("image_src")
   const target_url = env.IMG_URL_PREFIX + url.pathname
   const cache: Cache = (caches as any).default
   const cahed_responce = await cache.match(target_url)
@@ -49,7 +49,8 @@ const handle = async (event: FetchEvent) => {
   reqHeaders.set("Cache-Control", "max-age=31536000")
   let origin_response = await fetch(target_url)
   if (!origin_response.ok) {
-    const gateWayUrl = env.API_GATEWAY_URL + "?" + convertPathnameToSearchParams(url.pathname)
+    const gateWayUrl =
+      env.API_GATEWAY_URL + "?" + convertPathnameToSearchParams(url.pathname.slice(1), image_src)
     origin_response = await fetch(gateWayUrl)
   }
   const headers = new Headers(origin_response.headers)
@@ -67,16 +68,19 @@ const trimParam = (predicate: string, param: string | undefined): string | null 
 }
 const predicates = ["f_", "w_", "h_"]
 
-const convertPathnameToSearchParams = (image_pathname: string): string | false => {
+const convertPathnameToSearchParams = (
+  image_pathname: string,
+  image_src: string | null
+): string => {
   const path_arr = image_pathname.split("/")
-  const params_arr = path_arr[1].split("-")
-  const key = path_arr.length === 3 ? path_arr[2] : path_arr.slice(2).join("/")
+  const params_arr = path_arr[0].split("-")
+  const key = path_arr.length === 1 ? path_arr[0] : path_arr[1]
   const [format, width, height] = predicates.map(predicate => {
     return trimParam(predicate, params_arr.find(p => p.startsWith(predicate)))
   })
   return `${format ? "format=" + format + "&" : ""}${width ? "width=" + width + "&" : ""}${
     height ? "height=" + height + "&" : ""
-  }key=${key}`
+  }key=${key}${image_src ? "&image_src=" + image_src : ""}`
 }
 
 const try_catch_handler = async (event: FetchEvent) => {
