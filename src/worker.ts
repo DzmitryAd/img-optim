@@ -31,26 +31,26 @@ const kvEnvStore = new KvEnvStore()
 
 type TWorkerCtxEnv = {
   API_GATEWAY_URL: string
-  IMG_URL_PREFIX: string
+  FORMATED_IMG_URL_PREFIX: string
+  ORIGIN_IMG_URL_PREFIX: string
 }
 
 const handle = async (event: FetchEvent) => {
   const env: TWorkerCtxEnv = await kvEnvStore.getEnv()
   const url = new URL(event.request.url)
-  const image_src = url.searchParams.get("image_src")
-  const target_url = env.IMG_URL_PREFIX + url.pathname
+  const img_props = parsePath(url.pathname.slice(1))
+  const formated_target_url =
+    env.FORMATED_IMG_URL_PREFIX + changeExt(url.pathname, img_props.format)
   const cache: Cache = (caches as any).default
-  const cahed_responce = await cache.match(target_url)
+  const cahed_responce = await cache.match(formated_target_url)
   if (cahed_responce) {
     return cahed_responce
   }
-
-  const reqHeaders = new Headers(event.request.headers)
-  reqHeaders.set("Cache-Control", "max-age=31536000")
-  let origin_response = await fetch(target_url)
+  let origin_response = await fetch(formated_target_url)
   if (!origin_response.ok) {
-    const gateWayUrl =
-      env.API_GATEWAY_URL + "?" + convertPathnameToSearchParams(url.pathname.slice(1), image_src)
+    const image_src =
+      url.searchParams.get("image_src") || `${env.ORIGIN_IMG_URL_PREFIX}/${img_props.oldKey}`
+    const gateWayUrl = env.API_GATEWAY_URL + "?" + createSarchParams(img_props, image_src)
     origin_response = await fetch(gateWayUrl)
   }
   const headers = new Headers(origin_response.headers)
@@ -59,7 +59,7 @@ const handle = async (event: FetchEvent) => {
   })
   headers.delete("set-cookie")
   headers.set("Cache-Control", "max-age=31536000")
-  event.waitUntil(cache.put(target_url, responce_clone.clone()))
+  event.waitUntil(cache.put(formated_target_url, responce_clone.clone()))
   return responce_clone
 }
 
@@ -68,20 +68,59 @@ const trimParam = (predicate: string, param: string | undefined): string | null 
 }
 const predicates = ["f_", "w_", "h_"]
 
-const convertPathnameToSearchParams = (
-  image_pathname: string,
-  image_src: string | null
-): string => {
+type TImgProps = {
+  format: string | null
+  width: number | null
+  height: number | null
+  key: string
+  oldKey: string
+}
+
+const parsePath = (image_pathname: string): TImgProps => {
   const path_arr = image_pathname.split("/")
   const params_arr = path_arr[0].split("-")
-  const key = path_arr.length === 1 ? path_arr[0] : path_arr[1]
   const [format, width, height] = predicates.map(predicate => {
     return trimParam(predicate, params_arr.find(p => p.startsWith(predicate)))
   })
+  const oldKey = path_arr.slice(1).join("/")
+  const key = changeExt(oldKey, format)
+  return {
+    format,
+    width: Number(width),
+    height: Number(height),
+    key,
+    oldKey,
+  }
+}
+
+const changeExt = (keyName: string, newExt: string | null): string => {
+  const keyArr = keyName.split(".")
+  if (newExt) {
+    if (keyArr.length > 1) {
+      keyArr[keyArr.length - 1] = newExt
+    } else keyArr.push(newExt)
+  }
+  return keyArr.join(".")
+}
+
+const createSarchParams = (params: TImgProps, image_src: string): string => {
+  const { format, width, height, key } = params
   return `${format ? "format=" + format + "&" : ""}${width ? "width=" + width + "&" : ""}${
     height ? "height=" + height + "&" : ""
   }key=${key}${image_src ? "&image_src=" + image_src : ""}`
 }
+
+// const convertPathnameToSearchParams = (image_pathname: string, image_src: string): string => {
+//   const path_arr = image_pathname.split("/")
+//   const params_arr = path_arr[0].split("-")
+//   const key = path_arr.slice(1).join("/")
+//   const [format, width, height] = predicates.map(predicate => {
+//     return trimParam(predicate, params_arr.find(p => p.startsWith(predicate)))
+//   })
+//   return `${format ? "format=" + format + "&" : ""}${width ? "width=" + width + "&" : ""}${
+//     height ? "height=" + height + "&" : ""
+//   }key=${key}${image_src ? "&image_src=" + image_src : ""}`
+// }
 
 const try_catch_handler = async (event: FetchEvent) => {
   try {

@@ -66,5 +66,5 @@ exports.createNewKey = ({ width, height, format, key }: TNewKeyProps) => {
     result += `h_${height}`
   }
 
-  return result ? `${result}/${key}` : key
+  return `${result}/${key}`
 }

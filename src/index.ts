@@ -3,7 +3,7 @@ const { createNewKey, readStreamFromS3, streamToSharp, writeStreamToS3 } = requi
 const fetch = require("node-fetch")
 const { BUCKET, REGION } = process.env
 const URL = `http://${BUCKET}.s3.${REGION}.amazonaws.com`
-
+const allowedFormats = ["jpeg", "png", "webp"]
 type TQueryStringParameters = {
   format?: string
   width?: string
@@ -26,7 +26,19 @@ const handler: APIGatewayProxyHandler = async event => {
   const image_src = params.image_src || null
   const width = params.width ? Number(params.width) : null
   const height = params.height ? Number(params.height) : null
-  const format = params.format || null
+  const keyArr = key ? key.split(".") : []
+  const ext = keyArr.length > 1 ? keyArr[keyArr.length - 1] : null
+  let format = params.format || ext
+  if (format === "jpg") {
+    format = "jpeg"
+  }
+  console.log("format", format)
+  if (!format || !allowedFormats.includes(format)) {
+    return {
+      statusCode: 400,
+      body: "right format must be specified",
+    }
+  }
   const newKey = createNewKey({
     width,
     height,
@@ -35,10 +47,6 @@ const handler: APIGatewayProxyHandler = async event => {
   })
   const imageLocation = `${URL}/${newKey}`
 
-  const keyArr = key ? key.split(".") : []
-  const ext = keyArr.length > 1 ? keyArr[keyArr.length - 1] : null
-  const cFormat = format || ext || "webp"
-
   try {
     const readStream = image_src
       ? (await fetch(image_src)).body
@@ -46,7 +54,7 @@ const handler: APIGatewayProxyHandler = async event => {
     const resizeStream = streamToSharp({ width, height, format })
     const { writeStream, uploadFinished } = writeStreamToS3(
       { Bucket: bucket_destination, Key: newKey },
-      { ContentType: "image/" + cFormat }
+      { ContentType: "image/" + format }
     )
     readStream.pipe(resizeStream).pipe(writeStream)
     const uploadedData = await uploadFinished
