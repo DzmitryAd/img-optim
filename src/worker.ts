@@ -38,6 +38,9 @@ type TWorkerCtxEnv = {
 const handle = async (event: FetchEvent) => {
   const env: TWorkerCtxEnv = await kvEnvStore.getEnv()
   const url = new URL(event.request.url)
+  if (url.pathname.startsWith("/example")) {
+    return new Response(getExample(), { headers: { "content-type": "text/html" } })
+  }
   const img_props = parsePath(url.pathname.slice(1))
   const formated_target_url =
     env.FORMATED_IMG_URL_PREFIX + changeExt(url.pathname, img_props.format)
@@ -144,3 +147,30 @@ interface ServiceWorkerGlobalScope {
   ): void
 }
 declare const sw_global: ServiceWorkerGlobalScope
+
+const getExample = () =>
+  `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <picture>
+      <source
+        srcSet="https://img-proxy.palessit.dev/w_1170-f_webp/scarlett.jpg 1170w,
+        https://img-proxy.palessit.dev/w_970-f_webp/scarlett.jpg 970w,
+        https://img-proxy.palessit.dev/w_750-f_webp/scarlett.jpg 750w,
+        https://img-proxy.palessit.dev/w_320-f_webp/scarlett.jpg 320w"
+        type="image/webp"/>
+      <source
+        srcSet="https://img-proxy.palessit.dev/w_1170/scarlett.jpg 1170w,
+        https://img-proxy.palessit.dev/w_970/scarlett.jpg 970w,
+        https://img-proxy.palessit.dev/w_750/scarlett.jpg 750w,
+        https://img-proxy.palessit.dev/w_320/scarlett.jpg 320w"/>
+      <img src="https://img-proxy.palessit.dev/f_jpeg/scarlett.jpg" alt="1"
+    /></picture>
+  </body>
+</html>`
