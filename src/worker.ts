@@ -157,20 +157,20 @@ const getExample = () =>
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
   </head>
-  <body>
+  <body style="margin:0">
     <picture>
       <source
-        srcSet="https://img-proxy.palessit.dev/w_1170-f_webp/scarlett.jpg 1170w,
-        https://img-proxy.palessit.dev/w_970-f_webp/scarlett.jpg 970w,
-        https://img-proxy.palessit.dev/w_750-f_webp/scarlett.jpg 750w,
-        https://img-proxy.palessit.dev/w_320-f_webp/scarlett.jpg 320w"
+        srcSet="https://img-proxy.palessit.dev/w_1170-f_webp/daniel.jpg 1170w,
+        https://img-proxy.palessit.dev/w_970-f_webp/daniel.jpg 970w,
+        https://img-proxy.palessit.dev/w_750-f_webp/daniel.jpg 750w,
+        https://img-proxy.palessit.dev/w_320-f_webp/daniel.jpg 320w"
         type="image/webp"/>
       <source
-        srcSet="https://img-proxy.palessit.dev/w_1170/scarlett.jpg 1170w,
-        https://img-proxy.palessit.dev/w_970/scarlett.jpg 970w,
-        https://img-proxy.palessit.dev/w_750/scarlett.jpg 750w,
-        https://img-proxy.palessit.dev/w_320/scarlett.jpg 320w"/>
-      <img src="https://img-proxy.palessit.dev/f_jpeg/scarlett.jpg" alt="1"
+        srcSet="https://img-proxy.palessit.dev/w_1170/daniel.jpg 1170w,
+        https://img-proxy.palessit.dev/w_970/daniel.jpg 970w,
+        https://img-proxy.palessit.dev/w_750/daniel.jpg 750w,
+        https://img-proxy.palessit.dev/w_320/daniel.jpg 320w"/>
+      <img src="https://img-proxy.palessit.dev/f_jpeg/daniel.jpg" alt="1"
     /></picture>
   </body>
 </html>`
