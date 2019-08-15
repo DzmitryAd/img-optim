@@ -9,25 +9,25 @@ interface FetchEvent extends ExtendableEvent {
   readonly targetClientId: string
   respondWith(r: Response | Promise<Response>): void
 }
-type TKvStore = {
-  get: (key: string) => Promise<string | any | null>
-  put: (key: string, value: string, expiration?: { expirationTtl: number }) => Promise<void>
-  delete: (key: string) => Promise<void>
-}
+// type TKvStore = {
+//   get: (key: string) => Promise<string | any | null>
+//   put: (key: string, value: string, expiration?: { expirationTtl: number }) => Promise<void>
+//   delete: (key: string) => Promise<void>
+// }
 
-const KV_STORE = (global as any).IMG_PROXY_ENV as TKvStore
+// const KV_STORE = (global as any).IMG_PROXY_ENV as TKvStore
 
-class KvEnvStore {
-  private cache: TWorkerCtxEnv | null = null
-  async getEnv() {
-    if (!this.cache) {
-      const env = (await KV_STORE.get("WORKER_ENV")) || "{}"
-      this.cache = JSON.parse(env) as TWorkerCtxEnv
-    }
-    return this.cache
-  }
-}
-const kvEnvStore = new KvEnvStore()
+// class KvEnvStore {
+//   private cache: TWorkerCtxEnv | null = null
+//   async getEnv() {
+//     if (!this.cache) {
+//       const env = (await KV_STORE.get("WORKER_ENV")) || "{}"
+//       this.cache = JSON.parse(env) as TWorkerCtxEnv
+//     }
+//     return this.cache
+//   }
+// }
+// const kvEnvStore = new KvEnvStore()
 
 type TWorkerCtxEnv = {
   API_GATEWAY_URL: string
@@ -35,13 +35,25 @@ type TWorkerCtxEnv = {
   ORIGIN_IMG_URL_PREFIX: string
 }
 
+const API_GATEWAY_URL = "string"
+const FORMATED_IMG_URL_PREFIX = "string"
+const ORIGIN_IMG_URL_PREFIX = "string"
+
+const allowedWidth: number[] = [1170, 970, 750, 320]
+const allowedHeight: number[] = []
 const handle = async (event: FetchEvent) => {
-  const env: TWorkerCtxEnv = await kvEnvStore.getEnv()
+  const env: TWorkerCtxEnv = { API_GATEWAY_URL, FORMATED_IMG_URL_PREFIX, ORIGIN_IMG_URL_PREFIX }
   const url = new URL(event.request.url)
   if (url.pathname.startsWith("/example")) {
     return new Response(getExample(), { headers: { "content-type": "text/html" } })
   }
   const img_props = parsePath(url.pathname.slice(1))
+  if (
+    (img_props.width && !allowedWidth.includes(img_props.width)) ||
+    (img_props.height && !allowedHeight.includes(img_props.height))
+  ) {
+    return new Response("Not allowed image properties")
+  }
   const formated_target_url =
     env.FORMATED_IMG_URL_PREFIX + changeExt(url.pathname, img_props.format)
   const cache: Cache = (caches as any).default
