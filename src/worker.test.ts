@@ -1,3 +1,6 @@
+/**
+ * @jest-environment webworker
+ */
 import { changeExt, createSarchParams, parsePath, trimParam } from "./worker"
 test("remove predicate 'f_' from 'f_200'", () => {
   expect(trimParam("f_", "f_200")).toBe("200")

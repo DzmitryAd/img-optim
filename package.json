@@ -3,21 +3,18 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/preset-typescript": "^7.3.3",
     "@types/aws-lambda": "^8.10.30",
     "@types/jest": "^24.0.18",
     "@types/node": "^12.6.8",
     "@types/sharp": "^0.22.2",
-    "babel-jest": "^24.9.0",
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "ts-jest": "^24.0.2"
   },
   "dependencies": {
     "aws-sdk": "^2.495.0",
     "node-fetch": "^2.6.0",
     "sharp": "^0.22.1",
     "tslib": "^1.10.0",
-    "typescript": "^3.6.1-rc"
+    "typescript": "^3.5.3"
   }
 }
