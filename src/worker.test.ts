@@ -38,7 +38,7 @@ test("and create search string", () => {
 })
 test("parse pathname '/h_300-w_500/pict.jpeg'", () => {
   expect(parsePath("/h_300-w_500/pict.jpeg")).toEqual({
-    format: "jpeg",
+    format: null,
     width: 500,
     height: 300,
     key: "pict.jpeg",
@@ -49,7 +49,7 @@ test("and create search string", () => {
   expect(
     createSarchParams(
       {
-        format: "jpeg",
+        format: null,
         width: 500,
         height: 300,
         key: "pict.jpeg",
@@ -57,7 +57,7 @@ test("and create search string", () => {
       },
       "http://some-site.com/uploads"
     )
-  ).toBe("format=jpeg&width=500&height=300&key=pict.jpeg&image_src=http://some-site.com/uploads")
+  ).toBe("width=500&height=300&key=pict.jpeg&image_src=http://some-site.com/uploads")
 })
 test("parse pathname '/h_300-f_webp/pict.jpeg'", () => {
   expect(parsePath("/h_300-f_webp/pict.jpeg")).toEqual({
@@ -107,7 +107,7 @@ test("and create search string", () => {
 })
 test("parse pathname '/h_300/pict.jpeg'", () => {
   expect(parsePath("/h_300/pict.jpeg")).toEqual({
-    format: "jpeg",
+    format: null,
     width: null,
     height: 300,
     key: "pict.jpeg",
@@ -118,7 +118,7 @@ test("and create search string", () => {
   expect(
     createSarchParams(
       {
-        format: "jpeg",
+        format: null,
         width: null,
         height: 300,
         key: "pict.jpeg",
@@ -126,10 +126,10 @@ test("and create search string", () => {
       },
       "http://some-site.com/uploads"
     )
-  ).toBe("format=jpeg&height=300&key=pict.jpeg&image_src=http://some-site.com/uploads")
+  ).toBe("height=300&key=pict.jpeg&image_src=http://some-site.com/uploads")
 })
 test("parse pathname '/h_300-f_webp/some-folder/pict.jpeg'", () => {
-  expect(parsePath("/h_300/pict.jpeg")).toEqual({
+  expect(parsePath("/h_300-f_webp/some-folder/pict.jpeg")).toEqual({
     format: "webp",
     width: null,
     height: 300,

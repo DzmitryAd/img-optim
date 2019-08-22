@@ -16,7 +16,7 @@ const handle = async (event: FetchEvent) => {
   if (url.pathname.startsWith("/example")) {
     return new Response(getExample(), { headers: { "content-type": "text/html" } })
   }
-  const img_props = parsePath(url.pathname.slice(1))
+  const img_props = parsePath(url.pathname)
   if (
     (img_props.width && !allowedWidth.includes(img_props.width)) ||
     (img_props.height && !allowedHeight.includes(img_props.height))
@@ -61,7 +61,7 @@ type TImgProps = {
 }
 
 export const parsePath = (image_pathname: string): TImgProps => {
-  const path_arr = image_pathname.split("/")
+  const path_arr = image_pathname.slice(1).split("/")
   const params_arr = path_arr[0].split("-")
   const [format, width, height] = predicates.map(predicate => {
     return trimParam(predicate, params_arr.find(p => p.startsWith(predicate)))
@@ -70,8 +70,8 @@ export const parsePath = (image_pathname: string): TImgProps => {
   const key = changeExt(oldKey, format)
   return {
     format,
-    width: Number(width),
-    height: Number(height),
+    width: width ? Number(width) : null,
+    height: height ? Number(height) : null,
     key,
     oldKey,
   }
