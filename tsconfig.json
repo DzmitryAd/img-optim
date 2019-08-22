@@ -6,7 +6,7 @@
     "experimentalDecorators": true,
     "importHelpers": false,
     "jsx": "react",
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext", "webworker"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmitHelpers": true,

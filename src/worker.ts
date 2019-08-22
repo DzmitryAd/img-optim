@@ -1,34 +1,3 @@
-interface ExtendableEvent extends Event {
-  waitUntil(f: any): void
-}
-interface FetchEvent extends ExtendableEvent {
-  readonly clientId: string
-  readonly preloadResponse: Promise<any>
-  readonly request: Request
-  readonly resultingClientId: string
-  readonly targetClientId: string
-  respondWith(r: Response | Promise<Response>): void
-}
-// type TKvStore = {
-//   get: (key: string) => Promise<string | any | null>
-//   put: (key: string, value: string, expiration?: { expirationTtl: number }) => Promise<void>
-//   delete: (key: string) => Promise<void>
-// }
-
-// const KV_STORE = (global as any).IMG_PROXY_ENV as TKvStore
-
-// class KvEnvStore {
-//   private cache: TWorkerCtxEnv | null = null
-//   async getEnv() {
-//     if (!this.cache) {
-//       const env = (await KV_STORE.get("WORKER_ENV")) || "{}"
-//       this.cache = JSON.parse(env) as TWorkerCtxEnv
-//     }
-//     return this.cache
-//   }
-// }
-// const kvEnvStore = new KvEnvStore()
-
 type TWorkerCtxEnv = {
   API_GATEWAY_URL: string
   FORMATED_IMG_URL_PREFIX: string
@@ -78,7 +47,7 @@ const handle = async (event: FetchEvent) => {
   return responce_clone
 }
 
-const trimParam = (predicate: string, param: string | undefined): string | null => {
+export const trimParam = (predicate: string, param: string | undefined): string | null => {
   return param ? param.replace(predicate, "") : null
 }
 const predicates = ["f_", "w_", "h_"]
@@ -91,7 +60,7 @@ type TImgProps = {
   oldKey: string
 }
 
-const parsePath = (image_pathname: string): TImgProps => {
+export const parsePath = (image_pathname: string): TImgProps => {
   const path_arr = image_pathname.split("/")
   const params_arr = path_arr[0].split("-")
   const [format, width, height] = predicates.map(predicate => {
@@ -108,7 +77,7 @@ const parsePath = (image_pathname: string): TImgProps => {
   }
 }
 
-const changeExt = (keyName: string, newExt: string | null): string => {
+export const changeExt = (keyName: string, newExt: string | null): string => {
   const keyArr = keyName.split(".")
   if (newExt) {
     if (keyArr.length > 1) {
@@ -118,24 +87,12 @@ const changeExt = (keyName: string, newExt: string | null): string => {
   return keyArr.join(".")
 }
 
-const createSarchParams = (params: TImgProps, image_src: string): string => {
+export const createSarchParams = (params: TImgProps, image_src: string): string => {
   const { format, width, height, key } = params
   return `${format ? "format=" + format + "&" : ""}${width ? "width=" + width + "&" : ""}${
     height ? "height=" + height + "&" : ""
   }key=${key}${image_src ? "&image_src=" + image_src : ""}`
 }
-
-// const convertPathnameToSearchParams = (image_pathname: string, image_src: string): string => {
-//   const path_arr = image_pathname.split("/")
-//   const params_arr = path_arr[0].split("-")
-//   const key = path_arr.slice(1).join("/")
-//   const [format, width, height] = predicates.map(predicate => {
-//     return trimParam(predicate, params_arr.find(p => p.startsWith(predicate)))
-//   })
-//   return `${format ? "format=" + format + "&" : ""}${width ? "width=" + width + "&" : ""}${
-//     height ? "height=" + height + "&" : ""
-//   }key=${key}${image_src ? "&image_src=" + image_src : ""}`
-// }
 
 const try_catch_handler = async (event: FetchEvent) => {
   try {
@@ -145,20 +102,9 @@ const try_catch_handler = async (event: FetchEvent) => {
     return new Response(err.stack || err)
   }
 }
-
-sw_global.addEventListener("fetch", (_event: any) => {
-  const event: FetchEvent = _event
+;((global as unknown) as ServiceWorkerGlobalScope).addEventListener("fetch", event => {
   event.respondWith(try_catch_handler(event))
 })
-
-interface ServiceWorkerGlobalScope {
-  addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
-  ): void
-}
-declare const sw_global: ServiceWorkerGlobalScope
 
 const getExample = () =>
   `<!DOCTYPE html>

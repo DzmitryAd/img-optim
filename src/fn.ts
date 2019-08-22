@@ -13,14 +13,14 @@ type TStreamS3Props = {
   Bucket: BucketName
   Key: ObjectKey
 }
-exports.readStreamFromS3 = ({ Bucket, Key }: TStreamS3Props) => {
+const readStreamFromS3 = ({ Bucket, Key }: TStreamS3Props) => {
   return s3.getObject({ Bucket, Key }).createReadStream()
 }
 
 type TStreamWriteOptions = {
   ContentType: string
 }
-exports.writeStreamToS3 = ({ Bucket, Key }: TStreamS3Props, options: TStreamWriteOptions) => {
+const writeStreamToS3 = ({ Bucket, Key }: TStreamS3Props, options: TStreamWriteOptions) => {
   const pass = new stream.PassThrough()
   return {
     writeStream: pass,
@@ -40,7 +40,7 @@ type TOptimProps = {
   height: number | null
   format: "jpeg" | "png" | "webp" | null
 }
-exports.streamToSharp = ({ width, height, format }: TOptimProps) => {
+const streamToSharp = ({ width, height, format }: TOptimProps) => {
   return format
     ? sharp()
         .resize(width, height)
@@ -48,7 +48,7 @@ exports.streamToSharp = ({ width, height, format }: TOptimProps) => {
     : sharp().resize(width, height)
 }
 type TNewKeyProps = TOptimProps & { key: string }
-exports.createNewKey = ({ width, height, format, key }: TNewKeyProps) => {
+const createNewKey = ({ width, height, format, key }: TNewKeyProps) => {
   let result = ""
   if (format) {
     result += `f_${format}`
@@ -68,3 +68,8 @@ exports.createNewKey = ({ width, height, format, key }: TNewKeyProps) => {
 
   return `${result}/${key}`
 }
+
+exports.readStreamFromS3 = readStreamFromS3
+exports.writeStreamToS3 = writeStreamToS3
+exports.streamToSharp = streamToSharp
+exports.createNewKey = createNewKey
