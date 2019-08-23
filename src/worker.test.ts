@@ -1,5 +1,5 @@
 /**
- * @jest-environment webworker
+ * @jest-environment jsdom
  */
 import { changeExt, createSarchParams, parsePath, trimParam } from "./worker"
 test("remove predicate 'f_' from 'f_200'", () => {
