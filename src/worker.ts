@@ -21,7 +21,7 @@ const handle = async (event: FetchEvent) => {
     (img_props.width && !allowedWidth.includes(img_props.width)) ||
     (img_props.height && !allowedHeight.includes(img_props.height))
   ) {
-    return new Response("Not allowed image properties")
+    return new Response("Not allowed image properties", { status: 404 })
   }
   const formated_target_url =
     env.FORMATED_IMG_URL_PREFIX + changeExt(url.pathname, img_props.format)
