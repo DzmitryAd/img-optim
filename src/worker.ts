@@ -38,11 +38,11 @@ const handle = async (event: FetchEvent) => {
     origin_response = await fetch(gateWayUrl)
   }
   const headers = new Headers(origin_response.headers)
+  headers.delete("set-cookie")
+  headers.set("Cache-Control", "max-age=31536000")
   const responce_clone = new Response(origin_response.clone().body, {
     headers,
   })
-  headers.delete("set-cookie")
-  headers.set("Cache-Control", "max-age=31536000")
   event.waitUntil(cache.put(formated_target_url, responce_clone.clone()))
   return responce_clone
 }
