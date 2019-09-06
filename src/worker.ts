@@ -13,7 +13,6 @@ const allowedHeight: number[] = []
 const handle = async (event: FetchEvent) => {
   const env: TWorkerCtxEnv = { API_GATEWAY_URL, FORMATED_IMG_URL_PREFIX, ORIGIN_IMG_URL_PREFIX }
   const url = new URL(event.request.url)
-  url.pathname = decodeURIComponent(url.pathname)
   if (url.pathname.startsWith("/example")) {
     return new Response(getExample(), { headers: { "content-type": "text/html" } })
   }
@@ -34,7 +33,8 @@ const handle = async (event: FetchEvent) => {
   let origin_response = await fetch(formated_target_url)
   if (!origin_response.ok) {
     const image_src =
-      url.searchParams.get("image_src") || `${env.ORIGIN_IMG_URL_PREFIX}/${img_props.oldKey}`
+      url.searchParams.get("image_src") ||
+      `${env.ORIGIN_IMG_URL_PREFIX}/${encodeURIComponent(img_props.oldKey)}`
     const gateWayUrl = env.API_GATEWAY_URL + "?" + createSarchParams(img_props, image_src)
     origin_response = await fetch(gateWayUrl)
   }
