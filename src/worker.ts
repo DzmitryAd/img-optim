@@ -13,6 +13,7 @@ const allowedHeight: number[] = []
 const handle = async (event: FetchEvent) => {
   const env: TWorkerCtxEnv = { API_GATEWAY_URL, FORMATED_IMG_URL_PREFIX, ORIGIN_IMG_URL_PREFIX }
   const url = new URL(event.request.url)
+  url.pathname = decodeURIComponent(url.pathname)
   if (url.pathname.startsWith("/example")) {
     return new Response(getExample(), { headers: { "content-type": "text/html" } })
   }

@@ -22,7 +22,7 @@ const handler: APIGatewayProxyHandler = async event => {
   const params: TQueryStringParameters = event.queryStringParameters as TQueryStringParameters
   const bucket_origin = BUCKET
   const bucket_destination = BUCKET
-  const key = params.key
+  const key = decodeURIComponent(params.key)
   const image_src = params.image_src || null
   const width = params.width ? Number(params.width) : null
   const height = params.height ? Number(params.height) : null
@@ -45,9 +45,12 @@ const handler: APIGatewayProxyHandler = async event => {
     format,
     key,
   })
-  const imageLocation = `${URL}/${newKey}`
+  const imageLocation = `${URL}/${encodeURIComponent(newKey)}`
 
   try {
+    if (image_src) {
+      console.log("fetch to", image_src)
+    }
     const readStream = image_src
       ? (await fetch(image_src)).body
       : readStreamFromS3({ Bucket: bucket_origin, Key: key })
