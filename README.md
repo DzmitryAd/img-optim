@@ -1,3 +1,5 @@
+https://travis-ci.com/palessit/img-optim.svg?branch=master
+
 Service for onfly size and format image convertation
 
 For build lambda part, use node 10.x
@@ -8,7 +10,7 @@ In worker KV need to specify URL for lambda API Gateway and also URL for s3 buck
 Usage:
 
 url format:
-_workerUrl_/params/key?image_src=_imageSrcUrl_
+_workerUrl_/params/key?image*src=\_imageSrcUrl*
 
 workerUrl - required - url where worker resonse
 
