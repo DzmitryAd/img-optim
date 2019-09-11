@@ -1,5 +1,4 @@
-https://travis-ci.com/palessit/img-optim.svg?branch=master
-
+[![Build Status](https://travis-ci.com/palessit/img-optim.svg?branch=master)](https://travis-ci.com/palessit/img-optim)
 Service for onfly size and format image convertation
 
 For build lambda part, use node 10.x
