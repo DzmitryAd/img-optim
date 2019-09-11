@@ -4,9 +4,9 @@ type TWorkerCtxEnv = {
   ORIGIN_IMG_URL_PREFIX: string
 }
 
-const API_GATEWAY_URL = "string"
-const FORMATED_IMG_URL_PREFIX = "string"
-const ORIGIN_IMG_URL_PREFIX = "string"
+const API_GATEWAY_URL = "string" //need to specify
+const FORMATED_IMG_URL_PREFIX = "string" //need to specify
+const ORIGIN_IMG_URL_PREFIX = "string" //need to specify
 
 const allowedWidth: number[] = [1170, 970, 750, 320]
 const allowedHeight: number[] = []
