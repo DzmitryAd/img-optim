@@ -48,7 +48,7 @@ const streamToSharp = ({ width, height, format }: TOptimProps) => {
     : sharp().resize(width, height)
 }
 type TNewKeyProps = TOptimProps & { key: string }
-const createNewKey = ({ width, height, format, key }: TNewKeyProps) => {
+export const createNewKey = ({ width, height, format, key }: TNewKeyProps) => {
   let result = ""
   if (format) {
     result += `f_${format}`

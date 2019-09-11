@@ -1,4 +1,4 @@
-const createNewKey = require("./fn")
+import { createNewKey } from "./fn"
 
 test("create key 'f_webp-w_500-h_300/pict.webp'", () => {
   expect(
