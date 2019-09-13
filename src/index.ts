@@ -1,7 +1,7 @@
 import { APIGatewayProxyHandler } from "aws-lambda"
 const { createNewKey, readStreamFromS3, streamToSharp, writeStreamToS3 } = require("./fn")
 const fetch = require("node-fetch")
-const { BUCKET, REGION } = process.env
+const { BUCKET, REGION, BAUTH_TOKEN } = process.env
 const URL = `http://${BUCKET}.s3.${REGION}.amazonaws.com`
 const allowedFormats = ["jpeg", "png", "webp"]
 type TQueryStringParameters = {
@@ -51,8 +51,15 @@ const handler: APIGatewayProxyHandler = async event => {
     if (image_src) {
       console.log("fetch to", image_src)
     }
-    const readStream = image_src
-      ? (await fetch(image_src)).body
+    const response = image_src
+      ? await fetch(image_src, { headers: { authorization: BAUTH_TOKEN } })
+      : null
+    if (!response.ok) {
+      console.log("request failed")
+      return response
+    }
+    const readStream = response
+      ? response.body
       : readStreamFromS3({ Bucket: bucket_origin, Key: key })
     const resizeStream = streamToSharp({ width, height, format })
     const { writeStream, uploadFinished } = writeStreamToS3(
