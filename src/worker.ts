@@ -38,6 +38,9 @@ const handle = async (event: FetchEvent) => {
     const gateWayUrl = env.API_GATEWAY_URL + "?" + createSarchParams(img_props, image_src)
     origin_response = await fetch(gateWayUrl)
   }
+  if (!origin_response.ok) {
+    return origin_response
+  }
   const headers = new Headers(origin_response.headers)
   headers.delete("set-cookie")
   headers.set("Cache-Control", "max-age=31536000")

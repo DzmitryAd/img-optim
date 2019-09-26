@@ -32,7 +32,6 @@ const handler: APIGatewayProxyHandler = async event => {
   if (format === "jpg") {
     format = "jpeg"
   }
-  console.log("format", format)
   if (!format || !allowedFormats.includes(format)) {
     return {
       statusCode: 400,
@@ -56,7 +55,11 @@ const handler: APIGatewayProxyHandler = async event => {
       : null
     if (!response.ok) {
       console.log("request failed")
-      return response
+      try {
+        return response
+      } catch (e) {
+        console.error(e)
+      }
     }
     const readStream = response
       ? response.body
