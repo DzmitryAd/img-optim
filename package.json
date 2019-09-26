@@ -3,7 +3,7 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.30",
+    "@types/aws-lambda": "^8.10.33",
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.5",
     "@types/sharp": "^0.22.2",
