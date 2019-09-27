@@ -50,15 +50,14 @@ const handler: APIGatewayProxyHandler = async event => {
     if (image_src) {
       console.log("fetch to", image_src)
     }
-    const response = image_src
+    const response: Response = image_src
       ? await fetch(image_src, { headers: { authorization: BAUTH_TOKEN } })
       : null
     if (!response.ok) {
-      console.log("request failed")
-      try {
-        return response
-      } catch (e) {
-        console.error(e)
+      console.log(`request failed with ${response.status}:${response.statusText}`)
+      return {
+        statusCode: response.status,
+        body: await response.text(),
       }
     }
     const readStream = response
