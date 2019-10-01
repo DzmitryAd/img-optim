@@ -10,6 +10,7 @@ const ORIGIN_IMG_URL_PREFIX = "string" //need to specify
 
 const allowedWidth: number[] = [1170, 970, 750, 320]
 const allowedHeight: number[] = []
+const isAllowedQuality = (quality: number): boolean => quality > 0 && quality <= 100
 const handle = async (event: FetchEvent) => {
   const env: TWorkerCtxEnv = { API_GATEWAY_URL, FORMATED_IMG_URL_PREFIX, ORIGIN_IMG_URL_PREFIX }
   const url = new URL(event.request.url)
@@ -19,7 +20,8 @@ const handle = async (event: FetchEvent) => {
   const img_props = parsePath(url.pathname)
   if (
     (img_props.width && !allowedWidth.includes(img_props.width)) ||
-    (img_props.height && !allowedHeight.includes(img_props.height))
+    (img_props.height && !allowedHeight.includes(img_props.height)) ||
+    (img_props.quality && !isAllowedQuality(img_props.quality))
   ) {
     return new Response("Not allowed image properties", { status: 404 })
   }
@@ -54,12 +56,13 @@ const handle = async (event: FetchEvent) => {
 export const trimParam = (predicate: string, param: string | undefined): string | null => {
   return param ? param.replace(predicate, "") : null
 }
-const predicates = ["f_", "w_", "h_"]
+const predicates = ["f_", "w_", "h_", "q_"]
 
 type TImgProps = {
   format: string | null
   width: number | null
   height: number | null
+  quality: number | null
   key: string
   oldKey: string
 }
@@ -67,7 +70,7 @@ type TImgProps = {
 export const parsePath = (image_pathname: string): TImgProps => {
   const path_arr = image_pathname.slice(1).split("/")
   const params_arr = path_arr[0].split("-")
-  const [format, width, height] = predicates.map(predicate => {
+  const [format, width, height, quality] = predicates.map(predicate => {
     return trimParam(predicate, params_arr.find(p => p.startsWith(predicate)))
   })
   const oldKey = path_arr.slice(1).join("/")
@@ -76,6 +79,7 @@ export const parsePath = (image_pathname: string): TImgProps => {
     format,
     width: width ? Number(width) : null,
     height: height ? Number(height) : null,
+    quality: quality ? Number(quality) : null,
     key,
     oldKey,
   }
@@ -92,10 +96,12 @@ export const changeExt = (keyName: string, newExt: string | null): string => {
 }
 
 export const createSarchParams = (params: TImgProps, image_src: string): string => {
-  const { format, width, height, key } = params
+  const { format, width, height, key, quality } = params
   return `${format ? "format=" + format + "&" : ""}${width ? "width=" + width + "&" : ""}${
     height ? "height=" + height + "&" : ""
-  }key=${key}${image_src ? "&image_src=" + image_src : ""}`
+  }${quality ? "quality=" + quality + "&" : ""}key=${key}${
+    image_src ? "&image_src=" + image_src : ""
+  }`
 }
 
 const try_catch_handler = async (event: FetchEvent) => {
@@ -122,7 +128,7 @@ const getExample = () =>
   <body style="margin:0">
     <picture>
       <source
-        srcSet="https://img-proxy.palessit.dev/w_1170-f_webp/daniel.jpg 1170w,
+        srcSet="https://img-proxy.palessit.dev/w_1170-f_webp-q_100/daniel.jpg 1170w,
         https://img-proxy.palessit.dev/w_970-f_webp/daniel.jpg 970w,
         https://img-proxy.palessit.dev/w_750-f_webp/daniel.jpg 750w,
         https://img-proxy.palessit.dev/w_320-f_webp/daniel.jpg 320w"

@@ -8,6 +8,7 @@ type TQueryStringParameters = {
   format?: string
   width?: string
   height?: string
+  quality?: string
   key: string
   image_src?: string
 }
@@ -26,6 +27,7 @@ const handler: APIGatewayProxyHandler = async event => {
   const image_src = params.image_src || null
   const width = params.width ? Number(params.width) : null
   const height = params.height ? Number(params.height) : null
+  const quality = params.quality ? Number(params.quality) : null
   const keyArr = key ? key.split(".") : []
   const ext = keyArr.length > 1 ? keyArr[keyArr.length - 1] : null
   let format = params.format || ext
@@ -38,10 +40,17 @@ const handler: APIGatewayProxyHandler = async event => {
       body: "right format must be specified",
     }
   }
+  if (quality && (quality < 1 || quality > 100)) {
+    return {
+      statusCode: 400,
+      body: "quality must be between 1 and 100",
+    }
+  }
   const newKey = createNewKey({
     width,
     height,
     format,
+    quality,
     key,
   })
   const imageLocation = `${URL}/${encodeURIComponent(newKey)}`
@@ -50,9 +59,8 @@ const handler: APIGatewayProxyHandler = async event => {
     if (image_src) {
       console.log("fetch to", image_src)
     }
-    const response: Response = image_src
-      ? await fetch(image_src, { headers: { authorization: BAUTH_TOKEN } })
-      : null
+    const fetchHeaders = BAUTH_TOKEN ? { authorization: BAUTH_TOKEN } : {}
+    const response: Response = image_src ? await fetch(image_src, { headers: fetchHeaders }) : null
     if (!response.ok) {
       console.log(`request failed with ${response.status}:${response.statusText}`)
       return {
@@ -63,7 +71,7 @@ const handler: APIGatewayProxyHandler = async event => {
     const readStream = response
       ? response.body
       : readStreamFromS3({ Bucket: bucket_origin, Key: key })
-    const resizeStream = streamToSharp({ width, height, format })
+    const resizeStream = streamToSharp({ width, height, format, quality })
     const { writeStream, uploadFinished } = writeStreamToS3(
       { Bucket: bucket_destination, Key: newKey },
       { ContentType: "image/" + format }

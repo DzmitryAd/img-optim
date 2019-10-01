@@ -34,6 +34,7 @@ test("and create search string", () => {
         height: 300,
         key: "pict.webp",
         oldKey: "pict.jpeg",
+        quality: null,
       },
       "http://some-site.com/uploads"
     )
@@ -56,6 +57,7 @@ test("and create search string", () => {
         width: 500,
         height: 300,
         key: "pict.jpeg",
+        quality: null,
         oldKey: "pict.jpeg",
       },
       "http://some-site.com/uploads"
@@ -79,6 +81,7 @@ test("and create search string", () => {
         width: null,
         height: 300,
         key: "pict.webp",
+        quality: null,
         oldKey: "pict.jpeg",
       },
       "http://some-site.com/uploads"
@@ -102,6 +105,7 @@ test("and create search string", () => {
         width: null,
         height: null,
         key: "pict.webp",
+        quality: null,
         oldKey: "pict.jpeg",
       },
       "http://some-site.com/uploads"
@@ -125,6 +129,7 @@ test("and create search string", () => {
         width: null,
         height: 300,
         key: "pict.jpeg",
+        quality: null,
         oldKey: "pict.jpeg",
       },
       "http://some-site.com/uploads"
@@ -147,10 +152,38 @@ test("and create search string", () => {
         format: "webp",
         width: null,
         height: 300,
+        quality: null,
         key: "some-folder/pict.webp",
         oldKey: "some-folder/pict.jpeg",
       },
       "http://some-site.com/uploads"
     )
   ).toBe("format=webp&height=300&key=some-folder/pict.webp&image_src=http://some-site.com/uploads")
+})
+test("parse pathname '/h_300-w_500-f_webp-q_95/pict.jpeg'", () => {
+  expect(parsePath("/h_300-w_500-f_webp/pict.jpeg")).toEqual({
+    format: "webp",
+    width: 500,
+    height: 300,
+    key: "pict.webp",
+    oldKey: "pict.jpeg",
+    quality: 95,
+  })
+})
+test("and create search string", () => {
+  expect(
+    createSarchParams(
+      {
+        format: "webp",
+        width: 500,
+        height: 300,
+        key: "pict.webp",
+        oldKey: "pict.jpeg",
+        quality: 95,
+      },
+      "http://some-site.com/uploads"
+    )
+  ).toBe(
+    "format=webp&width=500&height=300&quality=95&key=pict.webp&image_src=http://some-site.com/uploads"
+  )
 })

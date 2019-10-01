@@ -1,5 +1,6 @@
 const AWS = require("aws-sdk")
 import { BucketName, ObjectKey } from "aws-sdk/clients/s3"
+// import sharp from "sharp"
 const sharp = require("sharp")
 const stream = require("stream")
 const { S3_KEY, S3_SECRET } = process.env
@@ -38,17 +39,18 @@ const writeStreamToS3 = ({ Bucket, Key }: TStreamS3Props, options: TStreamWriteO
 type TOptimProps = {
   width: number | null
   height: number | null
+  quality: number | null
   format: "jpeg" | "png" | "webp" | null
 }
-const streamToSharp = ({ width, height, format }: TOptimProps) => {
+const streamToSharp = ({ width, height, format, quality }: TOptimProps) => {
   return format
     ? sharp()
         .resize(width, height)
-        .toFormat(format)
+        .toFormat(format, { quality: quality ? quality : 85 })
     : sharp().resize(width, height)
 }
 type TNewKeyProps = TOptimProps & { key: string }
-export const createNewKey = ({ width, height, format, key }: TNewKeyProps) => {
+export const createNewKey = ({ width, height, format, key, quality }: TNewKeyProps) => {
   let result = ""
   if (format) {
     result += `f_${format}`
@@ -64,6 +66,12 @@ export const createNewKey = ({ width, height, format, key }: TNewKeyProps) => {
       result += "-"
     }
     result += `h_${height}`
+  }
+  if (quality) {
+    if (result) {
+      result += "-"
+    }
+    result += `q_${quality}`
   }
 
   return `${result}/${key}`
