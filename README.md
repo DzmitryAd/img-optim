@@ -48,6 +48,7 @@ _workerUrl_/_params_/_key_?image_src=_imageSrcUrl_
 - format as _f\__
 - width as _w\__
 - height as _h\__
+- quality between 1 and 100 as _q\__. Default quality is 85
 
 need at least one parameter.
 
@@ -75,3 +76,4 @@ https://img-proxy.palessit.dev/f_webp-h_600/scarlett.jpg?image_src=http://images
 
 **NOTICE!** if you want to specify format throw extension and s3 don't store formatted image with specified size params and this extension, service will try to find original image and read key as path to original image. So if you still want to specify format throw ext, you shall specify directly url with image_src as example:
 https://img-proxy.palessit.dev/h_600/scarlett.webp?image_src=http://images6.fanpop.com/image/photos/42700000/Scarlett-Johansson-scarlett-johansson-42744568-1200-1600.jpg
+
