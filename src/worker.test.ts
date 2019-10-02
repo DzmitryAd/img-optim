@@ -21,6 +21,7 @@ test("parse pathname '/h_300-w_500-f_webp/pict.jpeg'", () => {
     format: "webp",
     width: 500,
     height: 300,
+    quality: null,
     key: "pict.webp",
     oldKey: "pict.jpeg",
   })
@@ -45,6 +46,7 @@ test("parse pathname '/h_300-w_500/pict.jpeg'", () => {
     format: null,
     width: 500,
     height: 300,
+    quality: null,
     key: "pict.jpeg",
     oldKey: "pict.jpeg",
   })
@@ -69,6 +71,7 @@ test("parse pathname '/h_300-f_webp/pict.jpeg'", () => {
     format: "webp",
     width: null,
     height: 300,
+    quality: null,
     key: "pict.webp",
     oldKey: "pict.jpeg",
   })
@@ -93,6 +96,7 @@ test("parse pathname '/f_webp/pict.jpeg'", () => {
     format: "webp",
     width: null,
     height: null,
+    quality: null,
     key: "pict.webp",
     oldKey: "pict.jpeg",
   })
@@ -117,6 +121,7 @@ test("parse pathname '/h_300/pict.jpeg'", () => {
     format: null,
     width: null,
     height: 300,
+    quality: null,
     key: "pict.jpeg",
     oldKey: "pict.jpeg",
   })
@@ -141,6 +146,7 @@ test("parse pathname '/h_300-f_webp/some-folder/pict.jpeg'", () => {
     format: "webp",
     width: null,
     height: 300,
+    quality: null,
     key: "some-folder/pict.webp",
     oldKey: "some-folder/pict.jpeg",
   })
@@ -161,7 +167,7 @@ test("and create search string", () => {
   ).toBe("format=webp&height=300&key=some-folder/pict.webp&image_src=http://some-site.com/uploads")
 })
 test("parse pathname '/h_300-w_500-f_webp-q_95/pict.jpeg'", () => {
-  expect(parsePath("/h_300-w_500-f_webp/pict.jpeg")).toEqual({
+  expect(parsePath("/h_300-w_500-f_webp-q_95/pict.jpeg")).toEqual({
     format: "webp",
     width: 500,
     height: 300,
