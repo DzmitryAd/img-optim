@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { changeExt, createSarchParams, parsePath, trimParam } from "./worker"
+import { changeExt, createSarchParams, parsePath, trimParam } from "./api-common"
 test("remove predicate 'f_' from 'f_200'", () => {
   expect(trimParam("f_", "f_200")).toBe("200")
 })
