@@ -1,9 +1,23 @@
 import { APIGatewayProxyHandler } from "aws-lambda"
-const { createNewKey, readStreamFromS3, streamToSharp, writeStreamToS3 } = require("./fn")
-const fetch = require("node-fetch")
-const { BUCKET, REGION, BAUTH_TOKEN } = process.env
+import { readStreamFromS3, writeStreamToS3 } from "./s3"
+import { createFileKey, streamToSharp } from "./convert-common"
+import fetch from "node-fetch"
+
+const { BUCKET, REGION, AUTH_TOKEN } = process.env
+
+if (!BUCKET) {
+  throw new Error("Invalid BUCKET")
+}
+if (!REGION) {
+  throw new Error("Invalid REGION")
+}
+if (!AUTH_TOKEN) {
+  throw new Error("Invalid AUTH_TOKEN")
+}
+
 const URL = `http://${BUCKET}.s3.${REGION}.amazonaws.com`
 const allowedFormats = ["jpeg", "png", "webp"]
+
 type TQueryStringParameters = {
   format?: string
   width?: string
@@ -46,7 +60,7 @@ const handler: APIGatewayProxyHandler = async event => {
       body: "quality must be between 1 and 100",
     }
   }
-  const newKey = createNewKey({
+  const newKey = createFileKey({
     width,
     height,
     format,
@@ -59,7 +73,7 @@ const handler: APIGatewayProxyHandler = async event => {
     if (image_src) {
       console.log("fetch to", image_src)
     }
-    const fetchHeaders = BAUTH_TOKEN ? { authorization: BAUTH_TOKEN } : {}
+    const fetchHeaders = AUTH_TOKEN ? { authorization: AUTH_TOKEN } : {}
     const response: Response = image_src ? await fetch(image_src, { headers: fetchHeaders }) : null
     if (!response.ok) {
       console.log(`request failed with ${response.status}:${response.statusText}`)
@@ -71,6 +85,10 @@ const handler: APIGatewayProxyHandler = async event => {
     const readStream = response
       ? response.body
       : readStreamFromS3({ Bucket: bucket_origin, Key: key })
+
+    if (!readStream) {
+      throw new Error("Empty read stream")
+    }
     const resizeStream = streamToSharp({ width, height, format, quality })
     const { writeStream, uploadFinished } = writeStreamToS3(
       { Bucket: bucket_destination, Key: newKey },
