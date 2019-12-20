@@ -1,17 +1,21 @@
 {
+  "author": "Palessit",
+  "description": "Images resize and conversion microservice.",
   "scripts": {
     "test": "jest"
   },
+  "license": "MIT",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.36",
     "@types/jest": "^24.0.23",
     "@types/node": "^12.12.14",
+    "@types/node-fetch": "^2.5.4",
     "@types/sharp": "^0.23.1",
     "jest": "^24.9.0",
     "ts-jest": "^24.2.0"
   },
   "dependencies": {
-    "aws-sdk": "^2.585.0",
+    "@aws-sdk/client-s3-node": "^0.1.0-preview.2",
     "node-fetch": "^2.6.0",
     "sharp": "^0.23.4",
     "tslib": "^1.10.0",
