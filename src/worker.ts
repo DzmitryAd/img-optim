@@ -26,7 +26,7 @@ const handle = async (event: FetchEvent) => {
     return new Response("Not allowed image properties", { status: 404 })
   }
   const formated_target_url =
-    env.FORMATED_IMG_URL_PREFIX + changeExt(url.pathname, img_props.format)
+    env.FORMATED_IMG_URL_PREFIX + changeExt(createNewKey(img_props), img_props.format)
   const cache: Cache = (caches as any).default
   const cahed_responce = await cache.match(formated_target_url)
   if (cahed_responce) {
@@ -71,7 +71,10 @@ export const parsePath = (image_pathname: string): TImgProps => {
   const path_arr = image_pathname.slice(1).split("/")
   const params_arr = path_arr[0].split("-")
   const [format, width, height, quality] = predicates.map(predicate => {
-    return trimParam(predicate, params_arr.find(p => p.startsWith(predicate)))
+    return trimParam(
+      predicate,
+      params_arr.find(p => p.startsWith(predicate))
+    )
   })
   const oldKey = path_arr.slice(1).join("/")
   const key = changeExt(oldKey, format)
@@ -83,6 +86,33 @@ export const parsePath = (image_pathname: string): TImgProps => {
     key,
     oldKey,
   }
+}
+
+const createNewKey = ({ width, height, format, key, quality }: TImgProps) => {
+  let result = "/"
+  if (format) {
+    result += `f_${format}`
+  }
+  if (width) {
+    if (result) {
+      result += "-"
+    }
+    result += `w_${width}`
+  }
+  if (height) {
+    if (result) {
+      result += "-"
+    }
+    result += `h_${height}`
+  }
+  if (quality) {
+    if (result) {
+      result += "-"
+    }
+    result += `q_${quality}`
+  }
+
+  return `${result}/${key}`
 }
 
 export const changeExt = (keyName: string, newExt: string | null): string => {
