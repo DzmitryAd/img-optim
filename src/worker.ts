@@ -10,6 +10,7 @@ const ORIGIN_IMG_URL_PREFIX = "string" //need to specify
 
 const allowedWidth: number[] = [1170, 970, 750, 320]
 const allowedHeight: number[] = []
+const bypassFormat: string[] = []
 const isAllowedQuality = (quality: number): boolean => quality > 0 && quality <= 100
 const handle = async (event: FetchEvent) => {
   const env: TWorkerCtxEnv = { API_GATEWAY_URL, FORMATED_IMG_URL_PREFIX, ORIGIN_IMG_URL_PREFIX }
@@ -18,6 +19,33 @@ const handle = async (event: FetchEvent) => {
     return new Response(getExample(), { headers: { "content-type": "text/html" } })
   }
   const img_props = parsePath(url.pathname)
+
+  const pathnameSplit = url.pathname.split(".")
+  const format = pathnameSplit[pathnameSplit.length - 1]
+
+  if (bypassFormat.includes(format)) {
+    const image_src =
+      url.searchParams.get("image_src") ||
+      `${env.ORIGIN_IMG_URL_PREFIX}/${encodeURIComponent(img_props.oldKey)}`
+    const cache: Cache = (caches as any).default
+    const cahed_responce = await cache.match(image_src)
+    if (cahed_responce) {
+      return cahed_responce
+    }
+    let origin_response = await fetch(image_src)
+    if (!origin_response.ok) {
+      return origin_response
+    }
+    const headers = new Headers(origin_response.headers)
+    headers.delete("set-cookie")
+    headers.set("Cache-Control", "max-age=31536000")
+    const responce_clone = new Response(origin_response.clone().body, {
+      headers,
+    })
+    event.waitUntil(cache.put(image_src, responce_clone.clone()))
+    return responce_clone
+  }
+
   if (
     (img_props.width && !allowedWidth.includes(img_props.width)) ||
     (img_props.height && !allowedHeight.includes(img_props.height)) ||
