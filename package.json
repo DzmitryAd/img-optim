@@ -4,7 +4,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.36",
-    "@types/jest": "^24.0.23",
+    "@types/jest": "^24.9.1",
     "@types/node": "^12.12.14",
     "@types/sharp": "^0.23.1",
     "jest": "^24.9.0",
