@@ -8,7 +8,7 @@
     "@types/node": "^13.7.6",
     "@types/sharp": "^0.24.0",
     "jest": "^25.1.0",
-    "ts-jest": "^25.2.1"
+    "ts-jest": "^25.3.0"
   },
   "dependencies": {
     "aws-sdk": "^2.627.0",
