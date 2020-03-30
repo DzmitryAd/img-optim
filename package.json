@@ -11,7 +11,7 @@
     "ts-jest": "^25.2.1"
   },
   "dependencies": {
-    "aws-sdk": "^2.627.0",
+    "aws-sdk": "^2.648.0",
     "node-fetch": "^2.6.0",
     "sharp": "^0.24.1",
     "tslib": "^1.11.0",
