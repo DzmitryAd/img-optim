@@ -454,10 +454,10 @@
   dependencies:
     type-detect "4.0.8"
 
-"@types/aws-lambda@^8.10.44":
-  version "8.10.44"
-  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.44.tgz#b50fe6568290bab258b92ab62c3029df66e7a1df"
-  integrity sha512-FsA+gjO9NOqNFN57PHnjNRyTvhhUMreejO1nHKi5LsnUoDktiLSvYSu/5TxQd/VxNd6mZJ4/V4rKbyOGSZvVUA==
+"@types/aws-lambda@^8.10.47":
+  version "8.10.47"
+  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.47.tgz#9ec9e730e78d1f3180be37cf55ab0815b96b225d"
+  integrity sha512-FIZjS1alDbH7qFpJxghmyS2g7h+DJjBj6Qhf2F4Nkz4LR+alTSvThQEAR2j9yRt7qlxDDxK/EagXDCURRSxo8A==
 
 "@types/babel__core@^7.1.0":
   version "7.1.2"
